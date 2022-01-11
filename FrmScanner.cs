@@ -79,7 +79,7 @@ namespace SensorScanner
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        if(line != "")
+                        if (line != "")
                         {
                             var items = line.Split(',');
                             if (items.Length > 0)
@@ -91,12 +91,11 @@ namespace SensorScanner
                     }
                     reader.Close();
                 }
-                if(wearDevList.Count() > 0)
+                if (wearDevList.Count() > 0)
                     _wearDevNum = wearDevList.Count() - 1;
                 else
                     _wearDevNum = wearDevList.Count();
-                
-                fs_wearDev = new FileStream("WearDev.csv", FileMode.Append, FileAccess.Write);
+
             }
             catch (Exception e)
             {
@@ -113,7 +112,7 @@ namespace SensorScanner
                     while (!reader.EndOfStream)
                     {
                         var line = reader.ReadLine();
-                        if(line != "")
+                        if (line != "")
                         {
                             var items = line.Split(',');
                             if (items.Length > 0)
@@ -130,7 +129,6 @@ namespace SensorScanner
                 else
                     _homeDevNum = homeDeviceList.Count();
 
-                fs_homeDevice = new FileStream("HomeDevice.csv", FileMode.Append, FileAccess.Write); 
             }
             catch (Exception e)
             {
@@ -229,19 +227,24 @@ namespace SensorScanner
             {
                 if (fileKind == 1)
                 {
+                    fs_wearDev = new FileStream("WearDev.csv", FileMode.Append, FileAccess.Write);
+
                     if (_wearDevNum == 0)
                     {
                         var header = Encoding.GetEncoding("shift_jis").GetBytes("通し番号" + "," + "BDアドレス" + "," + "シリアルID" + "\n");
                         fs_wearDev.Write(header, 0, header.Length);
                     }
                     _wearDevNum++;
-                    var data = Encoding.GetEncoding("shift_jis").GetBytes(_wearDevNum + "," +addressWithColon(item) + "," + addressLast6(item) + "\n");
+                    var data = Encoding.GetEncoding("shift_jis").GetBytes(_wearDevNum + "," + addressWithColon(item) + "," + addressLast6(item) + "\n");
 
                     fs_wearDev.Write(data, 0, data.Length);
                     logList.Add("Searched Device: WearDevice " + ":" + item);
+
+                    fs_wearDev.Close();
                 }
                 else if (fileKind == 2)
                 {
+                    fs_homeDevice = new FileStream("HomeDevice.csv", FileMode.Append, FileAccess.Write);
                     if (_homeDevNum == 0)
                     {
                         var header = Encoding.GetEncoding("shift_jis").GetBytes("通し番号" + "," + "BDアドレス" + "," + "シリアルID" + "\n");
@@ -252,6 +255,8 @@ namespace SensorScanner
 
                     fs_homeDevice.Write(data, 0, data.Length);
                     logList.Add("Searched Device: HomeDevice " + ":" + item);
+
+                    fs_homeDevice.Close();
                 }
             }
             else

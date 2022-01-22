@@ -36,7 +36,14 @@
             this.radioHome = new System.Windows.Forms.RadioButton();
             this.radioCore = new System.Windows.Forms.RadioButton();
             this.RightBottomPanel_1 = new System.Windows.Forms.Panel();
+            this.yearLbl = new System.Windows.Forms.Label();
+            this.yearCombo = new System.Windows.Forms.ComboBox();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.monthCombo = new System.Windows.Forms.ComboBox();
             this.radioPanel.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbxLog
@@ -92,7 +99,7 @@
             this.radioPanel.Controls.Add(this.radioCore);
             this.radioPanel.Location = new System.Drawing.Point(12, 12);
             this.radioPanel.Name = "radioPanel";
-            this.radioPanel.Size = new System.Drawing.Size(245, 52);
+            this.radioPanel.Size = new System.Drawing.Size(203, 52);
             this.radioPanel.TabIndex = 2;
             // 
             // radioHome
@@ -128,11 +135,102 @@
             this.RightBottomPanel_1.Size = new System.Drawing.Size(20, 2);
             this.RightBottomPanel_1.TabIndex = 6;
             // 
+            // yearLbl
+            // 
+            this.yearLbl.AutoSize = true;
+            this.yearLbl.Font = new System.Drawing.Font("MS PGothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.yearLbl.Location = new System.Drawing.Point(6, 12);
+            this.yearLbl.Margin = new System.Windows.Forms.Padding(0);
+            this.yearLbl.Name = "yearLbl";
+            this.yearLbl.Size = new System.Drawing.Size(43, 21);
+            this.yearLbl.TabIndex = 7;
+            this.yearLbl.Text = "202";
+            this.yearLbl.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // yearCombo
+            // 
+            this.yearCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.yearCombo.Font = new System.Drawing.Font("MS Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.yearCombo.FormattingEnabled = true;
+            this.yearCombo.Items.AddRange(new object[] {
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9"});
+            this.yearCombo.Location = new System.Drawing.Point(49, 10);
+            this.yearCombo.Name = "yearCombo";
+            this.yearCombo.Size = new System.Drawing.Size(39, 27);
+            this.yearCombo.TabIndex = 8;
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.yearLbl);
+            this.panel1.Controls.Add(this.monthCombo);
+            this.panel1.Controls.Add(this.yearCombo);
+            this.panel1.Location = new System.Drawing.Point(224, 15);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(201, 46);
+            this.panel1.TabIndex = 9;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("MS PGothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(88, 13);
+            this.label1.Margin = new System.Windows.Forms.Padding(0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(31, 21);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "年";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("MS PGothic", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(171, 14);
+            this.label2.Margin = new System.Windows.Forms.Padding(0);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(31, 21);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "月";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // monthCombo
+            // 
+            this.monthCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.monthCombo.Font = new System.Drawing.Font("MS Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.monthCombo.FormattingEnabled = true;
+            this.monthCombo.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12"});
+            this.monthCombo.Location = new System.Drawing.Point(127, 11);
+            this.monthCombo.Name = "monthCombo";
+            this.monthCombo.Size = new System.Drawing.Size(43, 27);
+            this.monthCombo.TabIndex = 8;
+            // 
             // FrmScanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(754, 496);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.RightBottomPanel_1);
             this.Controls.Add(this.radioPanel);
             this.Controls.Add(this.lbxLog);
@@ -145,6 +243,8 @@
             this.Text = "シリアルID記録ツール";
             this.radioPanel.ResumeLayout(false);
             this.radioPanel.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -157,5 +257,11 @@
         private System.Windows.Forms.RadioButton radioCore;
 		private System.Windows.Forms.Panel RightBottomPanel_1;
 		private System.Windows.Forms.TableLayoutPanel tableLayout;
+        private System.Windows.Forms.Label yearLbl;
+        private System.Windows.Forms.ComboBox yearCombo;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox monthCombo;
     }
 }

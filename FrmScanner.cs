@@ -20,6 +20,7 @@ namespace SensorScanner
 {
     struct BleDeviceData
     {
+        public int index;
         public string address;
         public string serial_id;
     }
@@ -35,7 +36,7 @@ namespace SensorScanner
         Dictionary<char, Dictionary<char, List<BleDeviceData>>> fileData;        
 
         private List<string> addressList; // read from file. without semicolon.
-        
+        private List<string> tempAddressList; //
         private BindingList<string> logList;
         private Action<string, int, bool> logAddAct;
         private Action enableScanAct;
@@ -43,10 +44,11 @@ namespace SensorScanner
         private Action<string> newDeviceAct;
 
         private Action<ulong> sendLedAct;
+        private Action<ulong> shutdownAct;
 
         private BluetoothLEAdvertisementWatcher watcher;
         private bool isScaning = false;
-        private bool isCheckedCore = true;
+        private int scanDeviceType = 0;        
         private int _row;        
         DateTime startTime;
 
@@ -65,6 +67,7 @@ namespace SensorScanner
             enableScanAct += enableScan;
             setTextAct += setTextBtn;
             sendLedAct += sendLed;
+            shutdownAct += shutdown;
             _row = 1;
 
             aTimer = new System.Timers.Timer(500);
@@ -77,14 +80,15 @@ namespace SensorScanner
             this.yearCombo.SelectedIndex = 0;
             this.monthCombo.SelectedIndex = 0;
 
-            this.tableLayout.Controls.Add(new Label() { Text = "BDアドレス", TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(300, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 0, 0);
-            this.tableLayout.Controls.Add(new Label() { Text = "シリアルID", TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(300, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 1, 0);            
+            this.tableLayout.Controls.Add(new Label() { Text = "BDアドレス", TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(150, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 0, 0);
+            this.tableLayout.Controls.Add(new Label() { Text = "シリアルID", TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(150, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 1, 0);            
         }
 
-        private bool fileOpen(bool isCore)
+        private bool fileOpen(int scanDeviceType)
         {
-            string file_name = isCore ? WEAR_DEV+".csv" : HOME_DEVICE+".csv";
-            char file_type = isCore ? 'c' : 'h';
+            string file_name = scanDeviceType<2 ? WEAR_DEV+".csv" : HOME_DEVICE+".csv";
+            
+            char file_type = scanDeviceType < 2 ? 'c' : 'h';
             try
             {
                 if (File.Exists(file_name))
@@ -111,7 +115,8 @@ namespace SensorScanner
                         {
                             fileData[year][month] = new List<BleDeviceData>();
                         }
-                        BleDeviceData item = new BleDeviceData();                        
+                        BleDeviceData item = new BleDeviceData();
+                        item.index = getIndex(items[0]);
                         item.address = items[1]; //with semicolon
                         item.serial_id = items[2]; //serial id
                         
@@ -123,7 +128,7 @@ namespace SensorScanner
             }
             catch (Exception)
             {
-                MyMessageBox msgBox = new MyMessageBox("「 " + file_name + " 」ファイルを生成できません。\nファイルを閉じてください。");
+                MyMessageBox msgBox = new MyMessageBox("「 " + file_name + " 」ファイルを読めません。\nファイルを閉じてください。");
                 msgBox.Text = "エラー";
                 msgBox.ShowDialog();
                 return false;
@@ -133,7 +138,7 @@ namespace SensorScanner
 
         private void showSavedMsg(string addr)
         {
-            string file_name = isCheckedCore ? WEAR_DEV+".csv" : HOME_DEVICE+".csv";
+            string file_name = scanDeviceType<2 ? WEAR_DEV+".csv" : HOME_DEVICE+".csv";
             logAddEvent("Saved to "+file_name, 1);
             MyMessageBox msgBox = new MyMessageBox("「" + addressLast6(addr) + "」の通し番号は「" + strMessage + "」です");
             msgBox.ShowDialog();
@@ -229,21 +234,34 @@ namespace SensorScanner
                     fileData[year][month] = new List<BleDeviceData>();
                 }
                 
-                BleDeviceData deviceData = new BleDeviceData();                
+                BleDeviceData deviceData = new BleDeviceData();
+                deviceData.index = 0;
                 deviceData.address = addressWithColon(item);
                 deviceData.serial_id = addressLast6(item);
+
+                if (fileData[year][month].Count == 0)
+                {
+                    deviceData.index = 1;
+                }
+                else
+                {
+                    BleDeviceData last = fileData[year][month].Last<BleDeviceData>();
+                    deviceData.index = last.index + 1;
+                }
+                strMessage = generateId(deviceData.index, fileKind == 1, year, month);
+
                 fileData[year][month].Add(deviceData);
-                strMessage =  generateId(fileData[year][month].Count, fileKind == 1, year, month);
+                
                 foreach ( KeyValuePair<char,Dictionary<char, List<BleDeviceData>>> yearDataList  in fileData)
                 {
                     char year_index = yearDataList.Key;
                     foreach(KeyValuePair<char, List<BleDeviceData>> monthDataList in yearDataList.Value)
                     {
                         char month_index = monthDataList.Key;
-                        List<BleDeviceData> deviceDataList = monthDataList.Value;
+                        List<BleDeviceData> deviceDataList = monthDataList.Value;                        
                         for ( int i = 0; i< deviceDataList.Count; i++)
-                        {
-                            var data = Encoding.GetEncoding("shift-jis").GetBytes(generateId(i+1, fileKind == 1, year_index, month_index) 
+                        {                            
+                            var data = Encoding.GetEncoding("shift-jis").GetBytes(generateId(deviceDataList[i].index, fileKind == 1, year_index, month_index) 
                                 + "," + deviceDataList[i].address + "," 
                                 + deviceDataList[i].serial_id + "\n");
                             fs.Write(data, 0, data.Length);                                
@@ -261,41 +279,61 @@ namespace SensorScanner
 
         private void addNewDevice(string address)
         {
-            Button ledBtn = new Button();
-            ledBtn.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            ledBtn.Size = new System.Drawing.Size(105, 35);
-            ledBtn.Text = "LED点滅";
-            ledBtn.TextAlign = ContentAlignment.MiddleCenter;
-
-            Button saveBtn = new Button();
-            saveBtn.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            saveBtn.Size = new System.Drawing.Size(105, 35);
-            saveBtn.Text = "記録";
-            saveBtn.TextAlign = ContentAlignment.MiddleCenter;
-
-            this.tableLayout.RowCount += 1;
+           this.tableLayout.RowCount += 1;
 
             this.tableLayout.Controls.Add(new Label() { Text = addressWithColon(address), TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(300, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 0, _row);
             this.tableLayout.Controls.Add(new Label() { Text = addressLast6(address), TextAlign = ContentAlignment.MiddleCenter, Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0))), Size = new System.Drawing.Size(200, 30), Padding = new System.Windows.Forms.Padding(0, 10, 0, 0) }, 1, _row);
-            this.tableLayout.Controls.Add(ledBtn, 2, _row);
-            this.tableLayout.Controls.Add(saveBtn, 3, _row);
-
-            ledBtn.Name = "LedBtn_" + _row;
-            ledBtn.Click += new EventHandler(LedBtn_Click);
-
-            saveBtn.Name = "SaveBtn_" + _row;
-            saveBtn.Click += new EventHandler(SaveBtn_Click);
-
+            
+            if (scanDeviceType < 2) // 0, 1
+            {
+                Button ledBtn = new Button();
+                ledBtn.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                ledBtn.Size = new System.Drawing.Size(105, 35);
+                ledBtn.Text = "LED点滅";
+                ledBtn.TextAlign = ContentAlignment.MiddleCenter;
+                ledBtn.Name = "LedBtn_" + _row;
+                ledBtn.Click += new EventHandler(LedBtn_Click);
+                this.tableLayout.Controls.Add(ledBtn, 2, _row);
+            }
+            
+            if (scanDeviceType % 2 == 0) // 0 or 2
+            {
+                Button saveBtn = new Button();
+                saveBtn.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                saveBtn.Size = new System.Drawing.Size(105, 35);
+                saveBtn.Text = "記録";
+                saveBtn.TextAlign = ContentAlignment.MiddleCenter;
+                saveBtn.Name = "SaveBtn_" + _row;
+                saveBtn.Click += new EventHandler(SaveBtn_Click);
+                this.tableLayout.Controls.Add(saveBtn, 3, _row);
+            }
+            if (scanDeviceType == 1)
+            {
+                Button shoutdownBtn = new Button();
+                shoutdownBtn.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+                shoutdownBtn.Size = new System.Drawing.Size(150, 35);
+                shoutdownBtn.Text = "シャットダウン";
+                shoutdownBtn.TextAlign = ContentAlignment.MiddleCenter;
+                shoutdownBtn.Name = "ShutdownBtn_" + _row;
+                shoutdownBtn.Click += new EventHandler(ShutdownBtn_Click);
+                this.tableLayout.Controls.Add(shoutdownBtn, 2, _row);
+            }
             _row++;
         }
 
         private void btnScan_Click(object sender, EventArgs e)
         {
-            if (this.radioCore.Checked)
-                isCheckedCore = true;  // Wear Dev
+            if (this.radioCore.Checked)            
+                scanDeviceType = 0;  //WearDev
+            else if (this.radioCore1.Checked)
+                scanDeviceType = 1;  //WearDev completed
+            else if (this.radioHome.Checked)
+                scanDeviceType = 2;  //HomeDevice
+            else if (this.radioHome1.Checked)
+                scanDeviceType = 3;  //HomeDevice completed
             else
-                isCheckedCore = false; // Home Device
-
+                return;
+            
             initTable();
 
             if (!isScaning)
@@ -306,8 +344,9 @@ namespace SensorScanner
                 fileData = new Dictionary<char, Dictionary<char, List<BleDeviceData>>>();                
 
                 addressList = new List<string>();
+                tempAddressList = new List<string>();
 
-                if (!fileOpen(isCheckedCore))
+                if (!fileOpen(scanDeviceType))
                 {
                     return;
                 }
@@ -336,21 +375,37 @@ namespace SensorScanner
         {
             var addr = args.BluetoothAddress;
             string sAddr = addr.ToString("X").ToUpper();
-            string file_name = isCheckedCore ? "WearDevice" : "HomeDevice";
-
-            if (args.Advertisement.LocalName == file_name)
+            string file_name = scanDeviceType<2 ? WEAR_DEV : HOME_DEVICE;
+            
+            if (args.Advertisement.LocalName != file_name) return;
+            
+            if (scanDeviceType % 2 == 0)
             {
                 if (addressList.Contains(sAddr))
                 {
-                    logAddEvent("Searched Device: " + file_name + ":" + sAddr + " (already saved)", 1);
+                    if (!tempAddressList.Contains(sAddr))
+                    {
+                        logAddEvent("Searched Device: " + file_name + ":" + sAddr + " (already saved)", 1);
+                        tempAddressList.Add(sAddr);
+                    }
                 }
                 else
                 {
                     findNewDeviceEvent(sAddr);
                     addressList.Add(sAddr);
-                    logAddEvent(sAddr, isCheckedCore?1:2);
+                    tempAddressList.Add(sAddr);
+                    logAddEvent(sAddr, 1);
                 }
-            }            
+            }
+            else
+            {
+                if (!tempAddressList.Contains(sAddr))
+                {
+                    findNewDeviceEvent(sAddr);
+                    tempAddressList.Add(sAddr);
+                }
+            }
+            
         }
         private void LedBtn_Click(object sender, EventArgs e)
         {
@@ -373,18 +428,56 @@ namespace SensorScanner
 
             var sRet = await device.GetGattServicesAsync();
             ReadOnlyCollection<GattDeviceService> serviceList = sRet.Services.ToList().AsReadOnly();
+            if (serviceList.Count == 0) return;
             var service = serviceList.First(s => s.Uuid == service_LED);
+            if (service == null) return;
+
             var cRet = await service.GetCharacteristicsAsync();
             ReadOnlyCollection<GattCharacteristic> characteristicList = cRet.Characteristics.ToList().AsReadOnly();
+            if (characteristicList.Count == 0) return;
             var characteristic = characteristicList.First(c => c.Uuid == characteristic_uuid_LED_DATA);
             byte[] tx = { 0x00, 0x00 };
             await characteristic.WriteValueAsync(tx.AsBuffer(), GattWriteOption.WriteWithoutResponse);
-            byte[] tx1 = { 0x00, 0x01 };
+            byte[] tx1 = { 0x10, 0x00 };
             await characteristic.WriteValueAsync(tx1.AsBuffer(), GattWriteOption.WriteWithoutResponse);
-            service.Session.Dispose();
-            device.Dispose();
+            byte[] tx2 = { 0x20, 0x00 };
+            await characteristic.WriteValueAsync(tx2.AsBuffer(), GattWriteOption.WriteWithoutResponse);
+            //await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+            characteristic.Service.Dispose();
         }
-        
+        private void ShutdownBtn_Click(object sender, EventArgs e)
+        {
+            Button shutdownBtn = sender as Button;
+            var name = shutdownBtn.Name;
+            var list = name.Split('_');
+            var rowIndex = Int32.Parse(list[1]);
+            var addrControl = this.tableLayout.GetControlFromPosition(0, rowIndex);
+            string bluetoothAddr = addrControl.Text.Replace(":", "");
+            ulong device_addr = Convert.ToUInt64(bluetoothAddr, 16);
+            this.Invoke(shutdownAct, device_addr);
+        }
+        private async void shutdown(ulong addr)
+        {
+            BluetoothLEDevice device = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
+            Guid service_LED = new Guid("1074c00d-8a96-fe1e-c5a5-a27d11f5c777");
+            Guid characteristic_uuid_LED_DATA = new Guid("1074ac01-8a96-fe1e-c5a5-a27d11f5c777");
+
+            var sRet = await device.GetGattServicesAsync();
+            ReadOnlyCollection<GattDeviceService> serviceList = sRet.Services.ToList().AsReadOnly();
+            if (serviceList.Count == 0) return;
+            var service = serviceList.First(s => s.Uuid == service_LED);
+            if (service == null) return;
+            var cRet = await service.GetCharacteristicsAsync();
+            ReadOnlyCollection<GattCharacteristic> characteristicList = cRet.Characteristics.ToList().AsReadOnly();
+            if (characteristicList.Count == 0) return;
+            var characteristic = characteristicList.First(c => c.Uuid == characteristic_uuid_LED_DATA);
+            byte[] tx = { 0x00, 0x00 };
+            await characteristic.WriteValueAsync(tx.AsBuffer(), GattWriteOption.WriteWithoutResponse);
+            byte[] tx1 = { 0xF0, 0x00 };
+            await characteristic.WriteValueAsync(tx1.AsBuffer(), GattWriteOption.WriteWithoutResponse);            
+            //await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+            characteristic.Service.Dispose();
+        }
         private void SaveBtn_Click(object sender, EventArgs e)
         {
             Button saveBtn = sender as Button;
@@ -396,10 +489,8 @@ namespace SensorScanner
             var addrControl = this.tableLayout.GetControlFromPosition(0, rowIndex);
 
             string bluetoothAddr = addrControl.Text.Replace(":", "");
-            if (isCheckedCore)
-                logAddEvent(bluetoothAddr, 1, true);
-            else
-                logAddEvent(bluetoothAddr, 2, true);
+            
+            logAddEvent(bluetoothAddr, scanDeviceType == 0?1:2, true);
 
             showSavedMsg(bluetoothAddr);
 
@@ -458,7 +549,11 @@ namespace SensorScanner
             ret += addZero(index);
             return ret;
         }
-
+        private int getIndex(string serial_id)
+        {
+            if (serial_id.Length != 7) return 0;
+            return Int32.Parse(serial_id.Substring(3));
+        }
     }
 }
 

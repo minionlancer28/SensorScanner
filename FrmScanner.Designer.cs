@@ -33,6 +33,8 @@
             this.tableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.btnScan = new System.Windows.Forms.Button();
             this.radioPanel = new System.Windows.Forms.Panel();
+            this.radioHome1 = new System.Windows.Forms.RadioButton();
+            this.radioCore1 = new System.Windows.Forms.RadioButton();
             this.radioHome = new System.Windows.Forms.RadioButton();
             this.radioCore = new System.Windows.Forms.RadioButton();
             this.RightBottomPanel_1 = new System.Windows.Forms.Panel();
@@ -53,9 +55,9 @@
             this.lbxLog.BackColor = System.Drawing.Color.Black;
             this.lbxLog.ForeColor = System.Drawing.Color.White;
             this.lbxLog.FormattingEnabled = true;
-            this.lbxLog.Location = new System.Drawing.Point(12, 261);
+            this.lbxLog.Location = new System.Drawing.Point(12, 313);
             this.lbxLog.Name = "lbxLog";
-            this.lbxLog.Size = new System.Drawing.Size(721, 225);
+            this.lbxLog.Size = new System.Drawing.Size(721, 173);
             this.lbxLog.TabIndex = 1;
             // 
             // tableLayout
@@ -67,18 +69,18 @@
             this.tableLayout.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayout.CausesValidation = false;
             this.tableLayout.ColumnCount = 4;
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 37.37374F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28.28283F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.17172F));
-            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 17.17172F));
-            this.tableLayout.Location = new System.Drawing.Point(12, 70);
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 56.92308F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 43.07692F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
+            this.tableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 150F));
+            this.tableLayout.Location = new System.Drawing.Point(13, 122);
             this.tableLayout.MaximumSize = new System.Drawing.Size(9999999, 9999999);
             this.tableLayout.MinimumSize = new System.Drawing.Size(707, 185);
             this.tableLayout.Name = "tableLayout";
             this.tableLayout.Padding = new System.Windows.Forms.Padding(0, 0, 20, 0);
             this.tableLayout.RowCount = 1;
             this.tableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayout.Size = new System.Drawing.Size(721, 185);
+            this.tableLayout.Size = new System.Drawing.Size(720, 185);
             this.tableLayout.TabIndex = 3;
             // 
             // btnScan
@@ -95,12 +97,36 @@
             // 
             // radioPanel
             // 
+            this.radioPanel.Controls.Add(this.radioHome1);
+            this.radioPanel.Controls.Add(this.radioCore1);
             this.radioPanel.Controls.Add(this.radioHome);
             this.radioPanel.Controls.Add(this.radioCore);
             this.radioPanel.Location = new System.Drawing.Point(12, 12);
             this.radioPanel.Name = "radioPanel";
-            this.radioPanel.Size = new System.Drawing.Size(203, 52);
+            this.radioPanel.Size = new System.Drawing.Size(203, 110);
             this.radioPanel.TabIndex = 2;
+            // 
+            // radioHome1
+            // 
+            this.radioHome1.AutoSize = true;
+            this.radioHome1.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.radioHome1.Location = new System.Drawing.Point(3, 81);
+            this.radioHome1.Name = "radioHome1";
+            this.radioHome1.Size = new System.Drawing.Size(184, 23);
+            this.radioHome1.TabIndex = 3;
+            this.radioHome1.Text = "HOME(完成品試験)";
+            this.radioHome1.UseVisualStyleBackColor = true;
+            // 
+            // radioCore1
+            // 
+            this.radioCore1.AutoSize = true;
+            this.radioCore1.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.radioCore1.Location = new System.Drawing.Point(3, 52);
+            this.radioCore1.Name = "radioCore1";
+            this.radioCore1.Size = new System.Drawing.Size(183, 23);
+            this.radioCore1.TabIndex = 2;
+            this.radioCore1.Text = "CORE(完成品試験)";
+            this.radioCore1.UseVisualStyleBackColor = true;
             // 
             // radioHome
             // 
@@ -108,9 +134,9 @@
             this.radioHome.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.radioHome.Location = new System.Drawing.Point(3, 26);
             this.radioHome.Name = "radioHome";
-            this.radioHome.Size = new System.Drawing.Size(190, 23);
+            this.radioHome.Size = new System.Drawing.Size(165, 23);
             this.radioHome.TabIndex = 1;
-            this.radioHome.Text = "HOME(HomeDevice)";
+            this.radioHome.Text = "HOME(基板試験)";
             this.radioHome.UseVisualStyleBackColor = true;
             // 
             // radioCore
@@ -120,10 +146,10 @@
             this.radioCore.Font = new System.Drawing.Font("MS PGothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.radioCore.Location = new System.Drawing.Point(3, 3);
             this.radioCore.Name = "radioCore";
-            this.radioCore.Size = new System.Drawing.Size(159, 23);
+            this.radioCore.Size = new System.Drawing.Size(164, 23);
             this.radioCore.TabIndex = 0;
             this.radioCore.TabStop = true;
-            this.radioCore.Text = "CORE(WearDev)";
+            this.radioCore.Text = "CORE(基板試験)";
             this.radioCore.UseVisualStyleBackColor = true;
             // 
             // RightBottomPanel_1
@@ -263,5 +289,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox monthCombo;
+        private System.Windows.Forms.RadioButton radioHome1;
+        private System.Windows.Forms.RadioButton radioCore1;
     }
 }

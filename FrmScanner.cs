@@ -422,9 +422,11 @@ namespace SensorScanner
         }
         private async void sendLed(ulong addr)
         {
+            
             BluetoothLEDevice device = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
             Guid service_LED = new Guid("1074c00d-8a96-fe1e-c5a5-a27d11f5c777");
             Guid characteristic_uuid_LED_DATA = new Guid("1074ac01-8a96-fe1e-c5a5-a27d11f5c777");
+            if (device == null) return;
 
             var sRet = await device.GetGattServicesAsync();
             ReadOnlyCollection<GattDeviceService> serviceList = sRet.Services.ToList().AsReadOnly();
@@ -461,7 +463,7 @@ namespace SensorScanner
             BluetoothLEDevice device = await BluetoothLEDevice.FromBluetoothAddressAsync(addr);
             Guid service_LED = new Guid("1074c00d-8a96-fe1e-c5a5-a27d11f5c777");
             Guid characteristic_uuid_LED_DATA = new Guid("1074ac01-8a96-fe1e-c5a5-a27d11f5c777");
-
+            if (device == null) return;
             var sRet = await device.GetGattServicesAsync();
             ReadOnlyCollection<GattDeviceService> serviceList = sRet.Services.ToList().AsReadOnly();
             if (serviceList.Count == 0) return;
@@ -477,6 +479,10 @@ namespace SensorScanner
             await characteristic.WriteValueAsync(tx1.AsBuffer(), GattWriteOption.WriteWithoutResponse);            
             //await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             characteristic.Service.Dispose();
+
+            MyMessageBox msgBox = new MyMessageBox("シャットダウンコマンド送信しました。");
+            msgBox.Text = "エラー";
+            msgBox.ShowDialog();
         }
         private void SaveBtn_Click(object sender, EventArgs e)
         {
@@ -554,6 +560,7 @@ namespace SensorScanner
             if (serial_id.Length != 7) return 0;
             return Int32.Parse(serial_id.Substring(3));
         }
+
     }
 }
 
